@@ -26,13 +26,19 @@ workflows:
       - name: Build Android release
         script: |
           LATEST_GOOGLE_PLAY_BUILD_NUMBER=$(google-play get-latest-build-number --package-name "$PACKAGE_NAME")
-          if [ -z $LATEST_GOOGLE_PLAY_BUILD_NUMBER ]; then
-              UPDATED_BUILD_NUMBER=$BUILD_NUMBER
+          
+          # If Google Play returns a number less than 20000, start from 20006 (v4's last version)
+          if [ -z "$LATEST_GOOGLE_PLAY_BUILD_NUMBER" ] || [ "$LATEST_GOOGLE_PLAY_BUILD_NUMBER" -lt 20000 ]; then
+              UPDATED_BUILD_NUMBER=20007
           else
               UPDATED_BUILD_NUMBER=$(($LATEST_GOOGLE_PLAY_BUILD_NUMBER + 1))
           fi
+          
           # Extract patch version from build number (20007 -> 7)
           PATCH_VERSION=$((UPDATED_BUILD_NUMBER - 20000))
+          
+          echo "Building with versionCode=$UPDATED_BUILD_NUMBER and versionName=2.0.$PATCH_VERSION"
+          
           cd android
           ./gradlew bundleRelease \
             -PversionCode=$UPDATED_BUILD_NUMBER \
