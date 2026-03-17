@@ -31,10 +31,12 @@ workflows:
           else
               UPDATED_BUILD_NUMBER=$(($LATEST_GOOGLE_PLAY_BUILD_NUMBER + 1))
           fi
+          # Extract patch version from build number (20007 -> 7)
+          PATCH_VERSION=$((UPDATED_BUILD_NUMBER - 20000))
           cd android
           ./gradlew bundleRelease \
             -PversionCode=$UPDATED_BUILD_NUMBER \
-            -PversionName=2.0.$UPDATED_BUILD_NUMBER
+            -PversionName=2.0.$PATCH_VERSION
     artifacts:
       - android/app/build/outputs/**/*.aab
     publishing:
