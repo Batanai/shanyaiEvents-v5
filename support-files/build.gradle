@@ -81,11 +81,9 @@ def enableMinifyInReleaseBuilds = (findProperty('android.enableMinifyInReleaseBu
  */
 def jscFlavor = 'io.github.react-native-community:jsc-android:2026004.+'
 
-def baseVersionCode = 20006
-
 def getMyVersionCode = { ->
-    def increment = project.hasProperty('versionCode') ? versionCode.toInteger() : 0
-    return baseVersionCode + increment
+    // CodeMagic passes the full versionCode, use it directly
+    return project.hasProperty('versionCode') ? versionCode.toInteger() : 1
 }
 
 def getMyVersionName = { ->
