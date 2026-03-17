@@ -11,15 +11,15 @@ workflows:
       vars:
         PACKAGE_NAME: "co.event.scanner"
     scripts:
-      - name: Set Android SDK location
-        script: |
-          echo "sdk.dir=$ANDROID_SDK_ROOT" > "$CM_BUILD_DIR/android/local.properties"
       - name: Install npm dependencies
         script: |
           npm install --legacy-peer-deps
       - name: Run Expo Prebuild
         script: |
           npx expo prebuild --clean
+      - name: Set Android SDK location
+        script: |
+          echo "sdk.dir=$ANDROID_SDK_ROOT" > "$CM_BUILD_DIR/android/local.properties"
       - name: Set up app/build.gradle
         script: |
           cp ./support-files/build.gradle android/app/
