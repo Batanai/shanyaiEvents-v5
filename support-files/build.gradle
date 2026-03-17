@@ -81,6 +81,17 @@ def enableMinifyInReleaseBuilds = (findProperty('android.enableMinifyInReleaseBu
  */
 def jscFlavor = 'io.github.react-native-community:jsc-android:2026004.+'
 
+def baseVersionCode = 20006
+
+def getMyVersionCode = { ->
+    def increment = project.hasProperty('versionCode') ? versionCode.toInteger() : 0
+    return baseVersionCode + increment
+}
+
+def getMyVersionName = { ->
+    return project.hasProperty('versionName') ? versionName : "2.0.0"
+}
+
 android {
     ndkVersion rootProject.ext.ndkVersion
 
@@ -92,8 +103,8 @@ android {
         applicationId 'co.event.scanner'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "2.0.0"
+        versionCode getMyVersionCode()
+        versionName getMyVersionName()
 
         buildConfigField "String", "REACT_NATIVE_RELEASE_LEVEL", "\"${findProperty('reactNativeReleaseLevel') ?: 'stable'}\""
     }
