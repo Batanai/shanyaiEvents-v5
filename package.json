@@ -1,21 +1,40 @@
 {
   "name": "shanyaievents-v5",
   "version": "1.0.0",
-  "main": "index.ts",
+  "main": "expo-router/entry",
   "scripts": {
     "start": "expo start",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
-    "web": "expo start --web"
+    "android": "expo run:android",
+    "ios": "expo run:ios",
+    "web": "expo start --web",
+    "prebuild:android": "npx expo prebuild --platform android --clean && cp support-files/build.gradle android/app/build.gradle",
+    "prebuild:clean": "npx expo prebuild --clean && cp support-files/build.gradle android/app/build.gradle"
   },
   "dependencies": {
+    "@expo/vector-icons": "^15.1.1",
+    "@tanstack/react-query": "^5.90.21",
+    "axios": "^1.13.6",
     "expo": "~55.0.6",
-    "expo-status-bar": "~55.0.4",
+    "expo-constants": "^55.0.7",
+    "expo-linking": "^55.0.7",
+    "expo-router": "^55.0.5",
+    "expo-status-bar": "^55.0.4",
+    "jwt-decode": "^4.0.0",
+    "moment": "^2.30.1",
     "react": "19.2.0",
-    "react-native": "0.83.2"
+    "react-dom": "^19.2.4",
+    "react-native": "0.83.2",
+    "react-native-safe-area-context": "^5.7.0",
+    "react-native-screens": "^4.24.0",
+    "react-native-shadow-2": "^7.1.2",
+    "react-native-svg": "^15.15.3",
+    "react-native-toast-message": "^2.3.3",
+    "react-native-vision-camera": "^4.7.3",
+    "zustand": "^5.0.12"
   },
   "devDependencies": {
     "@types/react": "~19.2.2",
+    "babel-preset-expo": "^55.0.11",
     "typescript": "~5.9.2"
   },
   "private": true
