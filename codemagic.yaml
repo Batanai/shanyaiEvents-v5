@@ -2,7 +2,7 @@ workflows:
   react-native-android:
     name: React Native Android v5
     max_build_duration: 120
-    instance_type: mac_mini_m4
+    instance_type: mac_mini_m2
     environment:
       android_signing:
         - shanyai-key
@@ -50,96 +50,4 @@ workflows:
       #   track: internal
       #   submit_as_draft: true
 
-  react-native-ios:
-    name: React Native iOS v5
-    max_build_duration: 120
-    instance_type: mac_mini_m2
-    integrations:
-      app_store_connect: ShanyaiApiKey
-    environment:
-      ios_signing:
-        distribution_type: app_store
-        bundle_identifier: co.event.scanner
-      vars:
-        BUNDLE_ID: "co.event.scanner"
-        XCODE_WORKSPACE: "shanyaieventsv5.xcworkspace"
-        XCODE_SCHEME: "shanyaieventsv5"
-        APP_STORE_APPLE_ID: 1632812193
-    scripts:
-      - name: Install npm dependencies
-        script: |
-          npm install --legacy-peer-deps
-      - name: Run Expo Prebuild
-        script: |
-          npx expo prebuild --clean
-      - name: Set Info.plist values
-        script: |
-          PLIST=$CM_BUILD_DIR/$XCODE_SCHEME/Info.plist
-          PLIST_BUDDY=/usr/libexec/PlistBuddy
-          $PLIST_BUDDY -c "Add :ITSAppUsesNonExemptEncryption bool false" $PLIST
-      - name: Install CocoaPods dependencies
-        script: |
-          cd ios && pod install
-      - name: Set up provisioning profiles settings on Xcode project
-        script: xcode-project use-profiles
-      - name: Increment build number
-        script: |
-          cd $CM_BUILD_DIR/ios
-
-          DESIRED_MAJOR_MINOR_VERSION="2.0"
-
-          LATEST_TESTFLIGHT_BUILD_NUMBER=$(app-store-connect get-latest-testflight-build-number "$APP_STORE_APPLE_ID" 2>&1)
-
-          echo "Fetched TestFlight build number: $LATEST_TESTFLIGHT_BUILD_NUMBER"
-
-          CURRENT_PATCH_VERSION=$(echo "$LATEST_TESTFLIGHT_BUILD_NUMBER" | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | awk -F '.' '{print $NF}')
-
-          echo "Extracted patch version (raw): '$CURRENT_PATCH_VERSION'"
-
-          if [[ "$CURRENT_PATCH_VERSION" =~ ^[0-9]+$ ]]; then
-              NEXT_PATCH_VERSION=$((CURRENT_PATCH_VERSION + 1))
-              echo "Converted and incremented patch version: $NEXT_PATCH_VERSION"
-          else
-              echo "Error: CURRENT_PATCH_VERSION is not numeric or missing. Defaulting to 40."
-              NEXT_PATCH_VERSION=40
-          fi
-
-          DESIRED_MAJOR_MINOR_VERSION=$(echo "$LATEST_TESTFLIGHT_BUILD_NUMBER" | grep -oE '[0-9]+\.[0-9]+' | head -1)
-
-          FULL_VERSION="$DESIRED_MAJOR_MINOR_VERSION.$NEXT_PATCH_VERSION"
-
-          echo "Setting marketing version (CFBundleShortVersionString) to $FULL_VERSION"
-          echo "Setting build number (CFBundleVersion) to $FULL_VERSION"
-
-          agvtool new-marketing-version $FULL_VERSION
-
-          agvtool new-version -all $FULL_VERSION
-
-          echo "Updated version details in Info.plist:"
-          defaults read $CM_BUILD_DIR/ios/$XCODE_SCHEME/Info.plist | grep "CFBundle"
-      - name: Build ipa for distribution
-        script: |
-          xcode-project build-ipa \
-            --workspace "$CM_BUILD_DIR/ios/$XCODE_WORKSPACE" \
-            --scheme "$XCODE_SCHEME"
-    artifacts:
-      - build/ios/ipa/*.ipa
-      - /tmp/xcodebuild_logs/*.log
-      - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.app
-      - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.dSYM
-    publishing:
-      email:
-        recipients:
-          - batiemc@gmail.com
-        notify:
-          success: true
-          failure: false
-      app_store_connect:
-        auth: integration
-
-        submit_to_testflight: true
-        beta_groups:
-          - group name 1
-          - group name 2
-
-        submit_to_app_store: false
+  
